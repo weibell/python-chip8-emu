@@ -79,8 +79,8 @@ class CPU:
     def _build_opcode_table(self):
         return {
             0x0: {
-                0xe0: self._CLS,
-                0xee: self._RET
+                0xE0: self._CLS,
+                0xEE: self._RET
             },
             0x1: self._JP_nnn,
             0x2: self._CALL_nnn,
@@ -98,23 +98,23 @@ class CPU:
                 0x5: self._SUB_Vx_Vy,
                 0x6: self._SHR_Vx,
                 0x7: self._SUBN_Vx_Vy,
-                0xe: self._SHL_Vx
+                0xE: self._SHL_Vx
             },
             0x9: self._SNE_Vx_Vy,
-            0xa: self._LD_I_nnn,
-            0xb: self._JP_V0_nnn,
-            0xc: self._RND_Vx_nn,
-            0xd: self._DRW_Vx_Vy_n,
-            0xe: {
-                0x9e: self._SKP_Vx,
-                0xa1: self._SKNP_Vx
+            0xA: self._LD_I_nnn,
+            0xB: self._JP_V0_nnn,
+            0xC: self._RND_Vx_nn,
+            0xD: self._DRW_Vx_Vy_n,
+            0xE: {
+                0x9E: self._SKP_Vx,
+                0xA1: self._SKNP_Vx
             },
-            0xf: {
+            0xF: {
                 0x07: self._LD_Vx_DT,
-                0x0a: self._LD_Vx_K,
+                0x0A: self._LD_Vx_K,
                 0x15: self._LD_DT_Vx,
                 0x18: self._LD_ST_Vx,
-                0x1e: self._ADD_I_Vx,
+                0x1E: self._ADD_I_Vx,
                 0x29: self._LD_F_Vx,
                 0x33: self._LD_B_Vx,
                 0x55: self._LD_I_Vx,
@@ -133,7 +133,7 @@ class CPU:
             else:
                 return self.opcode_table[first_nibble][self.nn]
         except KeyError:
-            raise UnknownInstruction(f"{self.instruction:#0{6}x}")
+            raise UnknownInstruction(f"{self.instruction:0{4}X}")
 
     @property
     def x(self) -> int:
