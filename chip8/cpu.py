@@ -79,14 +79,14 @@ class CPU:
     def _build_opcode_table(self):
         return {
             0x0: {
-                0xE0: self._CLS,
-                0xEE: self._RET
+                0xE0: self._CLS,  # 00E0
+                0xEE: self._RET  # 00EE
             },
-            0x1: self._JP_nnn,
-            0x2: self._CALL_nnn,
-            0x3: self._SE_Vx_nn,
-            0x4: self._SNE_Vx_nn,
-            0x5: self._SE_Vx_Vy,
+            0x1: self._JP_nnn,  # 1nnn
+            0x2: self._CALL_nnn,  # 2nnn
+            0x3: self._SE_Vx_nn,  # 3xnn
+            0x4: self._SNE_Vx_nn,  # 4xnn
+            0x5: self._SE_Vx_Vy,  # 5xy0
             0x6: self._LD_Vx_nn,
             0x7: self._ADD_Vx_nn,
             0x8: {
@@ -171,30 +171,33 @@ class CPU:
     def Vy(self, value: int):
         self.V[self.y] = value & 0xff
 
-    def _CLS(self):
+    def _CLS(self):  # 00E0
         for row in self.screen.screen_buffer:
             for x, _ in enumerate(row):
                 row[x] = False
 
-    def _RET(self):
+    def _RET(self):  # 00EE
         self.program_counter = self.stack.pop()
 
-    def _JP_nnn(self):
+    def _JP_nnn(self):  # 1nnn
         self.program_counter = self.nnn
 
-    def _CALL_nnn(self):
+    def _CALL_nnn(self):  # 2nnn
         self.stack.append(self.program_counter)
         self.program_counter = self.nnn
 
-    def _SE_Vx_nn(self):
+    def _SE_Vx_nn(self):  # 3xnn
         if self.Vx == self.nn:
             self.program_counter += 2
 
-    def _SNE_Vx_nn(self):
+    def _SNE_Vx_nn(self):  # 4xnn
         if self.Vx != self.nn:
             self.program_counter += 2
 
-    def _SE_Vx_Vy(self):
+    def _SE_Vx_Vy(self):  # 5xy0
+        if self.n != 0:
+            raise UnknownInstruction
+
         if self.Vx == self.Vy:
             self.program_counter += 2
 
