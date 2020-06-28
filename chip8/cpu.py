@@ -9,14 +9,14 @@ MEMORY_SIZE = 4096
 
 class CPU:
     """
-    The following naming convention (based on http://devernay.free.fr/hacks/chip8/C8TECH10.HTM)
-    is used to refer to the nibbles in an instruction, which generally follows a _nnn, _xyn, or _xkk form.
+    The following naming convention is used to refer to the nibbles in an instruction,
+    which generally follows a ?nnn, ?xnn, or ?xyn form.
 
-    nnn: A 12-bit value, the lowest 12 bits of the instruction
-    n:   A 4-bit value, the lowest 4 bits of the instruction
-    x:   A 4-bit value, the lower 4 bits of the high byte of the instruction
-    y:   A 4-bit value, the upper 4 bits of the low byte of the instruction
-    kk:  An 8-bit value, the lowest 8 bits of the instruction
+    nnn: the lowest 12 bits of the instruction
+    nn:  the lowest 8 bits of the instruction
+    n:   the lowest 4 bits of the instruction
+    x:   the lower 4 bits of the high byte of the instruction
+    y:   the upper 4 bits of the low byte of the instruction
     """
 
     screen: Screen
@@ -84,11 +84,11 @@ class CPU:
             },
             0x1: self._JP_nnn,
             0x2: self._CALL_nnn,
-            0x3: self._SE_Vx_kk,
-            0x4: self._SNE_Vx_kk,
+            0x3: self._SE_Vx_nn,
+            0x4: self._SNE_Vx_nn,
             0x5: self._SE_Vx_Vy,
-            0x6: self._LD_Vx_kk,
-            0x7: self._ADD_Vx_kk,
+            0x6: self._LD_Vx_nn,
+            0x7: self._ADD_Vx_nn,
             0x8: {
                 0x0: self._LD_Vx_Vy,
                 0x1: self._OR_Vx_Vy,
@@ -103,7 +103,7 @@ class CPU:
             0x9: self._SNE_Vx_Vy,
             0xa: self._LD_I_nnn,
             0xb: self._JP_V0_nnn,
-            0xc: self._RND_Vx_kk,
+            0xc: self._RND_Vx_nn,
             0xd: self._DRW_Vx_Vy_n,
             0xe: {
                 0x9e: self._SKP_Vx,
@@ -131,7 +131,7 @@ class CPU:
             elif first_nibble == 0x8:
                 return self.opcode_table[first_nibble][self.n]
             else:
-                return self.opcode_table[first_nibble][self.kk]
+                return self.opcode_table[first_nibble][self.nn]
         except KeyError:
             raise UnknownInstruction(f"{self.instruction:#0{6}x}")
 
@@ -148,7 +148,7 @@ class CPU:
         return self.instruction & 0x000f
 
     @property
-    def kk(self) -> int:
+    def nn(self) -> int:
         return self.instruction & 0x00ff
 
     @property
@@ -186,23 +186,23 @@ class CPU:
         self.stack.append(self.program_counter)
         self.program_counter = self.nnn
 
-    def _SE_Vx_kk(self) -> None:
-        if self.Vx == self.kk:
+    def _SE_Vx_nn(self) -> None:
+        if self.Vx == self.nn:
             self.program_counter += 2
 
-    def _SNE_Vx_kk(self) -> None:
-        if self.Vx != self.kk:
+    def _SNE_Vx_nn(self) -> None:
+        if self.Vx != self.nn:
             self.program_counter += 2
 
     def _SE_Vx_Vy(self) -> None:
         if self.Vx == self.Vy:
             self.program_counter += 2
 
-    def _LD_Vx_kk(self) -> None:
-        self.Vx = self.kk
+    def _LD_Vx_nn(self) -> None:
+        self.Vx = self.nn
 
-    def _ADD_Vx_kk(self) -> None:
-        self.Vx += self.kk
+    def _ADD_Vx_nn(self) -> None:
+        self.Vx += self.nn
 
     def _LD_Vx_Vy(self) -> None:
         self.Vx = self.Vy
@@ -246,8 +246,8 @@ class CPU:
     def _JP_V0_nnn(self) -> None:
         self.program_counter = self.nnn + self.V[0x0]
 
-    def _RND_Vx_kk(self) -> None:
-        self.Vx = random.getrandbits(8) & self.kk
+    def _RND_Vx_nn(self) -> None:
+        self.Vx = random.getrandbits(8) & self.nn
 
     def _DRW_Vx_Vy_n(self) -> None:
         self.V[0xf] = 0
