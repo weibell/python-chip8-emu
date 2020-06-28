@@ -52,10 +52,10 @@ class CPU:
 
         self.opcode_table = self._build_opcode_table()
 
-    def load(self, rom: bytes) -> None:
+    def load(self, rom: bytes):
         self.memory[self.starting_address:self.starting_address + len(rom)] = rom
 
-    def cpu_tick(self) -> None:
+    def cpu_tick(self):
         if self.waiting_for_keypress:
             return
 
@@ -160,7 +160,7 @@ class CPU:
         return self.V[self.x]
 
     @Vx.setter
-    def Vx(self, value: int) -> None:
+    def Vx(self, value: int):
         self.V[self.x] = value & 0xff
 
     @property
@@ -168,88 +168,88 @@ class CPU:
         return self.V[self.y]
 
     @Vy.setter
-    def Vy(self, value: int) -> None:
+    def Vy(self, value: int):
         self.V[self.y] = value & 0xff
 
-    def _CLS(self) -> None:
+    def _CLS(self):
         for row in self.screen.screen_buffer:
             for x, _ in enumerate(row):
                 row[x] = False
 
-    def _RET(self) -> None:
+    def _RET(self):
         self.program_counter = self.stack.pop()
 
-    def _JP_nnn(self) -> None:
+    def _JP_nnn(self):
         self.program_counter = self.nnn
 
-    def _CALL_nnn(self) -> None:
+    def _CALL_nnn(self):
         self.stack.append(self.program_counter)
         self.program_counter = self.nnn
 
-    def _SE_Vx_nn(self) -> None:
+    def _SE_Vx_nn(self):
         if self.Vx == self.nn:
             self.program_counter += 2
 
-    def _SNE_Vx_nn(self) -> None:
+    def _SNE_Vx_nn(self):
         if self.Vx != self.nn:
             self.program_counter += 2
 
-    def _SE_Vx_Vy(self) -> None:
+    def _SE_Vx_Vy(self):
         if self.Vx == self.Vy:
             self.program_counter += 2
 
-    def _LD_Vx_nn(self) -> None:
+    def _LD_Vx_nn(self):
         self.Vx = self.nn
 
-    def _ADD_Vx_nn(self) -> None:
+    def _ADD_Vx_nn(self):
         self.Vx += self.nn
 
-    def _LD_Vx_Vy(self) -> None:
+    def _LD_Vx_Vy(self):
         self.Vx = self.Vy
 
-    def _OR_Vx_Vy(self) -> None:
+    def _OR_Vx_Vy(self):
         self.Vx |= self.Vy
 
-    def _AND_Vx_Vy(self) -> None:
+    def _AND_Vx_Vy(self):
         self.Vx &= self.Vy
 
-    def _XOR_Vx_Vy(self) -> None:
+    def _XOR_Vx_Vy(self):
         self.Vx ^= self.Vy
 
-    def _ADD_Vx_Vy(self) -> None:
+    def _ADD_Vx_Vy(self):
         self.V[0xf] = 1 if self.Vx + self.Vy > 0xff else 0
         self.Vx += self.Vy
 
-    def _SUB_Vx_Vy(self) -> None:
+    def _SUB_Vx_Vy(self):
         self.V[0xf] = 0 if self.Vy > self.Vx else 1
         self.Vx -= self.Vy
 
-    def _SHR_Vx(self) -> None:
+    def _SHR_Vx(self):
         self.V[0xf] = self.Vx & 0b00000001
         self.Vx >>= 1
 
-    def _SUBN_Vx_Vy(self) -> None:
+    def _SUBN_Vx_Vy(self):
         self.V[0xf] = 0 if self.Vx > self.Vy else 1
         self.Vx = self.Vy - self.Vx
 
-    def _SHL_Vx(self) -> None:
+    def _SHL_Vx(self):
         self.V[0xf] = (self.Vx & 0b10000000) >> 7
         self.Vx <<= 1
 
-    def _SNE_Vx_Vy(self) -> None:
+    def _SNE_Vx_Vy(self):
         if self.Vx != self.Vy:
             self.program_counter += 2
 
-    def _LD_I_nnn(self) -> None:
+    def _LD_I_nnn(self):
         self.I = self.nnn
 
-    def _JP_V0_nnn(self) -> None:
+    def _JP_V0_nnn(self):
         self.program_counter = self.nnn + self.V[0x0]
 
-    def _RND_Vx_nn(self) -> None:
+    def _RND_Vx_nn(self):
         self.Vx = random.getrandbits(8) & self.nn
 
-    def _DRW_Vx_Vy_n(self) -> None:
+    def _DRW_Vx_Vy_n(self):
         self.V[0xf] = 0
         sprite = self.memory[self.I:self.I + self.n]
         for byte_number, byte in enumerate(sprite):
@@ -266,35 +266,35 @@ class CPU:
                 row[x] = not row[x]
         raise UpdateScreen
 
-    def _SKP_Vx(self) -> None:
+    def _SKP_Vx(self):
         if self.Vx in self.keyboard.pressed_keys:
             self.program_counter += 2
 
-    def _SKNP_Vx(self) -> None:
+    def _SKNP_Vx(self):
         if self.Vx not in self.keyboard.pressed_keys:
             self.program_counter += 2
 
-    def _LD_Vx_DT(self) -> None:
+    def _LD_Vx_DT(self):
         self.Vx = self.delay_timer
 
-    def _LD_Vx_K(self) -> None:
+    def _LD_Vx_K(self):
         self.waiting_for_keypress = True
         raise WaitForKeypress
 
-    def _LD_DT_Vx(self) -> None:
+    def _LD_DT_Vx(self):
         self.delay_timer = self.Vx
 
-    def _LD_ST_Vx(self) -> None:
+    def _LD_ST_Vx(self):
         self.sound_timer = self.Vx
 
-    def _ADD_I_Vx(self) -> None:
+    def _ADD_I_Vx(self):
         self.I += self.Vx
         self.I &= 0xffff  # TODO
 
-    def _LD_F_Vx(self) -> None:
+    def _LD_F_Vx(self):
         self.I = self.Vx * 5
 
-    def _LD_B_Vx(self) -> None:
+    def _LD_B_Vx(self):
         hundreds = self.Vx // 100
         tens = (self.Vx % 100) // 10
         ones = self.Vx % 10
@@ -302,11 +302,11 @@ class CPU:
         self.memory[self.I + 1] = tens
         self.memory[self.I + 2] = ones
 
-    def _LD_I_Vx(self) -> None:
+    def _LD_I_Vx(self):
         for reg in range(self.x + 1):
             self.memory[self.I + reg] = self.V[reg]
 
-    def _LD_Vx_I(self) -> None:
+    def _LD_Vx_I(self):
         for reg in range(self.x + 1):
             self.V[reg] = self.memory[self.I + reg]
 
