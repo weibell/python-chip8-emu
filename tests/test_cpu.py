@@ -24,7 +24,7 @@ class TestCPU(unittest.TestCase):
         self.assertEqual(0x00, self.cpu.delay_timer)
         self.assertEqual(0x00, self.cpu.sound_timer)
 
-    @unittest.skip("not implemented")
+    #@unittest.skip("not implemented")
     def test_JP_MC(self):  # 0nnn
         self.cpu.JP_MP()
 
