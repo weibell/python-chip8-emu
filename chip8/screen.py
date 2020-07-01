@@ -22,12 +22,12 @@ class Screen:
         self.scaling_factor = scaling_factor
         pygame.display.set_caption("CHIP-8")
 
-    def update(self) -> None:
+    def update(self):
         self.surface.fill(BLACK)
         self._draw_pixels()
         pygame.display.flip()
 
-    def _draw_pixels(self) -> None:
+    def _draw_pixels(self):
         for y, row in enumerate(self.screen_buffer):
             for x, pixel in enumerate(row):
                 if pixel:

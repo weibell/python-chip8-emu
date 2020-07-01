@@ -7,7 +7,7 @@ from chip8.screen import Screen
 
 
 class TestCPU(unittest.TestCase):
-    def setUp(self) -> None:
+    def setUp(self):
         self.screen = Screen()
         self.keyboard = Keyboard()
         self.cpu = CPU(self.screen, self.keyboard)
