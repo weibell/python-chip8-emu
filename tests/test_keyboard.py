@@ -1,5 +1,7 @@
+import os
 import unittest
 
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = ""
 import pygame
 
 from chip8.keyboard import Keyboard

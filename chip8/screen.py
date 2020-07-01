@@ -1,5 +1,7 @@
+import os
 from typing import List
 
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = ""
 import pygame
 
 WIDTH = 64

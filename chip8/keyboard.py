@@ -1,5 +1,7 @@
+import os
 from typing import Set, Union
 
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = ""
 import pygame
 
 KEY_MAPPING = {
