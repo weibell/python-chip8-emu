@@ -17,13 +17,10 @@ class Screen:
     scaling_factor: int
 
     def __init__(self, scaling_factor: int = 1):
-        pygame.init()
-        pygame.display.set_caption("CHIP-8")
         self.surface = pygame.display.set_mode((WIDTH * scaling_factor, HEIGHT * scaling_factor))
         self.screen_buffer = [[False] * WIDTH for _ in range(HEIGHT)]
         self.scaling_factor = scaling_factor
-
-        self.pressed_keys = set()
+        pygame.display.set_caption("CHIP-8")
 
     def update(self) -> None:
         self.surface.fill(BLACK)
