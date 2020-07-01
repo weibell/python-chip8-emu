@@ -45,7 +45,7 @@ class CPU:
         self.stack = []
         self.program_counter = starting_address
         self.V = [0x00] * 16
-        self.I = 0x0000
+        self.I = 0x000
         self.delay_timer = 0x00
         self.sound_timer = 0x00
         self.instruction = 0x0000
@@ -56,17 +56,11 @@ class CPU:
         self.memory[self.starting_address:self.starting_address + len(rom)] = rom
 
     def cpu_tick(self):
-        if self.waiting_for_keypress:
-            return
-
         self.instruction = self.memory[self.program_counter] << 8 | self.memory[self.program_counter + 1]
         self.program_counter += 2
         self.opcode_handler()
 
-    def sixty_hertz_tick(self):
-        if self.waiting_for_keypress:
-            return
-
+    def decrease_timers(self):
         if self.delay_timer > 0:
             self.delay_timer -= 1
         if self.sound_timer > 0:
@@ -87,38 +81,38 @@ class CPU:
             0x3: self._SE_Vx_nn,  # 3xnn
             0x4: self._SNE_Vx_nn,  # 4xnn
             0x5: self._SE_Vx_Vy,  # 5xy0
-            0x6: self._LD_Vx_nn,
-            0x7: self._ADD_Vx_nn,
+            0x6: self._LD_Vx_nn,  # 6xnn
+            0x7: self._ADD_Vx_nn,  # 7xnn
             0x8: {
-                0x0: self._LD_Vx_Vy,
-                0x1: self._OR_Vx_Vy,
-                0x2: self._AND_Vx_Vy,
-                0x3: self._XOR_Vx_Vy,
-                0x4: self._ADD_Vx_Vy,
-                0x5: self._SUB_Vx_Vy,
-                0x6: self._SHR_Vx,
-                0x7: self._SUBN_Vx_Vy,
-                0xE: self._SHL_Vx
+                0x0: self._LD_Vx_Vy,  # 8xy0
+                0x1: self._OR_Vx_Vy,  # 8xy1
+                0x2: self._AND_Vx_Vy,  # 8xy2
+                0x3: self._XOR_Vx_Vy,  # 8xy3
+                0x4: self._ADD_Vx_Vy,  # 8xy4
+                0x5: self._SUB_Vx_Vy,  # 8xy5
+                0x6: self._SHR_Vx_Vy,  # 8xy6
+                0x7: self._SUBN_Vx_Vy,  # 8xy7
+                0xE: self._SHL_Vx_Vy  # 8xyE
             },
-            0x9: self._SNE_Vx_Vy,
-            0xA: self._LD_I_nnn,
-            0xB: self._JP_V0_nnn,
-            0xC: self._RND_Vx_nn,
-            0xD: self._DRW_Vx_Vy_n,
+            0x9: self._SNE_Vx_Vy,  # 9xy0
+            0xA: self._LD_I_nnn,  # Annn
+            0xB: self._JP_V0_nnn,  # Bnnn
+            0xC: self._RND_Vx_nn,  # Cxnn
+            0xD: self._DRW_Vx_Vy_n,  # Dxyn
             0xE: {
-                0x9E: self._SKP_Vx,
-                0xA1: self._SKNP_Vx
+                0x9E: self._SKP_Vx,  # Ex9E
+                0xA1: self._SKNP_Vx  # ExA1
             },
             0xF: {
-                0x07: self._LD_Vx_DT,
-                0x0A: self._LD_Vx_K,
-                0x15: self._LD_DT_Vx,
-                0x18: self._LD_ST_Vx,
-                0x1E: self._ADD_I_Vx,
-                0x29: self._LD_F_Vx,
-                0x33: self._LD_B_Vx,
-                0x55: self._LD_I_Vx,
-                0x65: self._LD_Vx_I
+                0x07: self._LD_Vx_DT,  # Fx07
+                0x0A: self._LD_Vx_K,  # Fx0A
+                0x15: self._LD_DT_Vx,  # Fx15
+                0x18: self._LD_ST_Vx,  # Fx18
+                0x1E: self._ADD_I_Vx,  # Fx1E
+                0x29: self._LD_F_Vx,  # Fx29
+                0x33: self._LD_B_Vx,  # Fx33
+                0x55: self._LD_I_Vx,  # Fx55
+                0x65: self._LD_Vx_I  # Fx65
             }
         }
 
@@ -167,10 +161,6 @@ class CPU:
     def Vy(self) -> int:
         return self.V[self.y]
 
-    @Vy.setter
-    def Vy(self, value: int):
-        self.V[self.y] = value & 0xff
-
     def _CLS(self):  # 00E0
         for row in self.screen.screen_buffer:
             for x, _ in enumerate(row):
@@ -196,63 +186,66 @@ class CPU:
 
     def _SE_Vx_Vy(self):  # 5xy0
         if self.n != 0:
-            raise UnknownInstruction
+            raise UnknownInstruction(f"{self.instruction:0{4}X}")
 
         if self.Vx == self.Vy:
             self.program_counter += 2
 
-    def _LD_Vx_nn(self):
+    def _LD_Vx_nn(self):  # 6xnn
         self.Vx = self.nn
 
-    def _ADD_Vx_nn(self):
+    def _ADD_Vx_nn(self):  # 7xnn
         self.Vx += self.nn
 
-    def _LD_Vx_Vy(self):
+    def _LD_Vx_Vy(self):  # 8xy0
         self.Vx = self.Vy
 
-    def _OR_Vx_Vy(self):
+    def _OR_Vx_Vy(self):  # 8xy1
         self.Vx |= self.Vy
 
-    def _AND_Vx_Vy(self):
+    def _AND_Vx_Vy(self):  # 8xy2
         self.Vx &= self.Vy
 
-    def _XOR_Vx_Vy(self):
+    def _XOR_Vx_Vy(self):  # 8xy3
         self.Vx ^= self.Vy
 
-    def _ADD_Vx_Vy(self):
+    def _ADD_Vx_Vy(self):  # 8xy4
         self.V[0xf] = 1 if self.Vx + self.Vy > 0xff else 0
         self.Vx += self.Vy
 
-    def _SUB_Vx_Vy(self):
+    def _SUB_Vx_Vy(self):  # 8xy5
         self.V[0xf] = 0 if self.Vy > self.Vx else 1
         self.Vx -= self.Vy
 
-    def _SHR_Vx(self):
-        self.V[0xf] = self.Vx & 0b00000001
-        self.Vx >>= 1
+    def _SHR_Vx_Vy(self):  # 8xy6
+        self.V[0xf] = self.Vy & 0b00000001
+        self.Vx = self.Vy >> 1
 
-    def _SUBN_Vx_Vy(self):
+    def _SUBN_Vx_Vy(self):  # 8xy7
         self.V[0xf] = 0 if self.Vx > self.Vy else 1
         self.Vx = self.Vy - self.Vx
 
-    def _SHL_Vx(self):
-        self.V[0xf] = (self.Vx & 0b10000000) >> 7
-        self.Vx <<= 1
+    def _SHL_Vx_Vy(self):  # 8xyE
+        self.V[0xf] = self.Vy >> 7
+        self.Vx = self.Vy << 1
 
-    def _SNE_Vx_Vy(self):
+    def _SNE_Vx_Vy(self):  # 9xy0
+        if self.n != 0:
+            raise UnknownInstruction(f"{self.instruction:0{4}X}")
+
         if self.Vx != self.Vy:
             self.program_counter += 2
 
-    def _LD_I_nnn(self):
+    def _LD_I_nnn(self):  # Annn
         self.I = self.nnn
 
-    def _JP_V0_nnn(self):
+    def _JP_V0_nnn(self):  # Bnnn
         self.program_counter = self.nnn + self.V[0x0]
 
-    def _RND_Vx_nn(self):
+    def _RND_Vx_nn(self):  # Cxnn
         self.Vx = random.getrandbits(8) & self.nn
 
-    def _DRW_Vx_Vy_n(self):
+    def _DRW_Vx_Vy_n(self):  # Dxyn
         self.V[0xf] = 0
         sprite = self.memory[self.I:self.I + self.n]
         for byte_number, byte in enumerate(sprite):
@@ -269,35 +262,35 @@ class CPU:
                 row[x] = not row[x]
         raise UpdateScreen
 
-    def _SKP_Vx(self):
+    def _SKP_Vx(self):  # Ex9E
         if self.Vx in self.keyboard.pressed_keys:
             self.program_counter += 2
 
-    def _SKNP_Vx(self):
+    def _SKNP_Vx(self):  # ExA1
         if self.Vx not in self.keyboard.pressed_keys:
             self.program_counter += 2
 
-    def _LD_Vx_DT(self):
+    def _LD_Vx_DT(self):  # Fx07
         self.Vx = self.delay_timer
 
-    def _LD_Vx_K(self):
+    def _LD_Vx_K(self):  # Fx0A
         self.waiting_for_keypress = True
         raise WaitForKeypress
 
-    def _LD_DT_Vx(self):
+    def _LD_DT_Vx(self):  # Fx15
         self.delay_timer = self.Vx
 
-    def _LD_ST_Vx(self):
+    def _LD_ST_Vx(self):  # Fx18
         self.sound_timer = self.Vx
 
-    def _ADD_I_Vx(self):
+    def _ADD_I_Vx(self):  # Fx1E
         self.I += self.Vx
-        self.I &= 0xffff  # TODO
+        self.I &= 0xfff
 
-    def _LD_F_Vx(self):
+    def _LD_F_Vx(self):  # Fx29
         self.I = self.Vx * 5
 
-    def _LD_B_Vx(self):
+    def _LD_B_Vx(self):  # Fx33
         hundreds = self.Vx // 100
         tens = (self.Vx % 100) // 10
         ones = self.Vx % 10
@@ -305,13 +298,15 @@ class CPU:
         self.memory[self.I + 1] = tens
         self.memory[self.I + 2] = ones
 
-    def _LD_I_Vx(self):
+    def _LD_I_Vx(self):  # Fx55
         for reg in range(self.x + 1):
             self.memory[self.I + reg] = self.V[reg]
+        self.I += self.x + 1
 
-    def _LD_Vx_I(self):
+    def _LD_Vx_I(self):  # Fx65
         for reg in range(self.x + 1):
             self.V[reg] = self.memory[self.I + reg]
+        self.I += self.x + 1
 
 
 font_sprites = [
