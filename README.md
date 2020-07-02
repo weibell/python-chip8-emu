@@ -42,7 +42,7 @@ optional arguments:
 $ python3 main.py "roms/games/Pong (1 player).ch8"
 ```
 <div align="center">
-    ![test_opcode.ch8](images/screenshot_pong.png)
+    <img src="images/screenshot_pong.png?raw=true">
 </div>
 
 
@@ -50,13 +50,13 @@ $ python3 main.py "roms/games/Pong (1 player).ch8"
 $ python3 main.py "roms/games/Tetris [Fran Dachille, 1991].ch8""
 ```
 <div align="center">
-    ![test_opcode.ch8](images/screenshot_tetris.png)
+    <img src="images/screenshot_tetris.png?raw=true">
 </div>
 
 
 [test_opcode.ch8](https://github.com/corax89/chip8-test-rom) results:
 <div align="center">
-    ![test_opcode.ch8](images/screenshot_test_opcode.png)
+    <img src="images/screenshot_test_opcode.png?raw=true">
 </div>
 
 
