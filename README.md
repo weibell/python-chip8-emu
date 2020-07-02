@@ -4,9 +4,6 @@
 [CHIP-8](https://en.wikipedia.org/wiki/CHIP-8) emulation in Python
 
 
-```commandline
-$ python3 main.py "roms/programs/Chip8 emulator Logo [Garstyciuks].ch8""
-```
 <div align="center">
     <img src="images/screenshot_logo.png?raw=true">
 </div>
