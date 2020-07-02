@@ -7,7 +7,9 @@
 ```commandline
 $ python3 main.py "roms/programs/Chip8 emulator Logo [Garstyciuks].ch8""
 ```
-<img src="images/screenshot_logo.png?raw=true" align="center">
+<div align="center">
+    <img src="images/screenshot_logo.png?raw=true">
+</div>
 
 
 #### Introduction
@@ -39,18 +41,23 @@ optional arguments:
 ```commandline
 $ python3 main.py "roms/games/Pong (1 player).ch8"
 ```
-![test_opcode.ch8](images/screenshot_pong.png)
+<div align="center">
+    ![test_opcode.ch8](images/screenshot_pong.png)
+</div>
 
 
 ```commandline
 $ python3 main.py "roms/games/Tetris [Fran Dachille, 1991].ch8""
 ```
-![test_opcode.ch8](images/screenshot_tetris.png)
-
+<div align="center">
+    ![test_opcode.ch8](images/screenshot_tetris.png)
+</div>
 
 
 [test_opcode.ch8](https://github.com/corax89/chip8-test-rom) results:
-![test_opcode.ch8](images/screenshot_test_opcode.png)
+<div align="center">
+    ![test_opcode.ch8](images/screenshot_test_opcode.png)
+</div>
 
 
 
