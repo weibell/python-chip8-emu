@@ -38,11 +38,11 @@ class TestCPU(unittest.TestCase):
         self.assertEqual(0x00, self.cpu.sound_timer)
 
     def test_CLS(self):  # 00E0
-        for row in self.screen.screen_buffer:
+        for row in self.screen.buffer:
             for x, _ in enumerate(row):
                 row[x] = True
         self.cpu._CLS()
-        for row in self.screen.screen_buffer:
+        for row in self.screen.buffer:
             self.assertTrue(not any(row))
 
     def test_RET(self):  # 00EE
@@ -267,30 +267,30 @@ class TestCPU(unittest.TestCase):
         with self.assertRaises(UpdateScreen):
             self.cpu._DRW_Vx_Vy_n()
         for line in range(5):
-            self.assertEqual(cpu.font_sprites[digit * 5 + line], to_int(self.screen.screen_buffer[y + line][x:x + 8]))
+            self.assertEqual(cpu.font_sprites[digit * 5 + line], to_int(self.screen.buffer[y + line][x:x + 8]))
         self.assertEqual(0x00, self.cpu.V[0xf])
 
         with self.assertRaises(UpdateScreen):
             self.cpu._DRW_Vx_Vy_n()
         for line in range(5):
-            self.assertEqual(0x00, to_int(self.screen.screen_buffer[y + line][x:x + 8]))
+            self.assertEqual(0x00, to_int(self.screen.buffer[y + line][x:x + 8]))
         self.assertEqual(0x01, self.cpu.V[0xf])
 
         self.cpu.V[0x1] = 62
         self.cpu.V[0x2] = 30
         with self.assertRaises(UpdateScreen):
             self.cpu._DRW_Vx_Vy_n()
-        self.assertEqual([True, True], self.screen.screen_buffer[30][62:64])
-        self.assertEqual([False, False], self.screen.screen_buffer[31][62:64])
-        self.assertEqual([False, False], self.screen.screen_buffer[0][62:64])
-        self.assertEqual([False, True], self.screen.screen_buffer[1][62:64])
-        self.assertEqual([False, True], self.screen.screen_buffer[2][62:64])
+        self.assertEqual([True, True], self.screen.buffer[30][62:64])
+        self.assertEqual([False, False], self.screen.buffer[31][62:64])
+        self.assertEqual([False, False], self.screen.buffer[0][62:64])
+        self.assertEqual([False, True], self.screen.buffer[1][62:64])
+        self.assertEqual([False, True], self.screen.buffer[2][62:64])
 
-        self.assertEqual([True, True], self.screen.screen_buffer[30][0:2])
-        self.assertEqual([False, True], self.screen.screen_buffer[31][0:2])
-        self.assertEqual([True, False], self.screen.screen_buffer[0][0:2])
-        self.assertEqual([False, False], self.screen.screen_buffer[1][0:2])
-        self.assertEqual([False, False], self.screen.screen_buffer[2][0:2])
+        self.assertEqual([True, True], self.screen.buffer[30][0:2])
+        self.assertEqual([False, True], self.screen.buffer[31][0:2])
+        self.assertEqual([True, False], self.screen.buffer[0][0:2])
+        self.assertEqual([False, False], self.screen.buffer[1][0:2])
+        self.assertEqual([False, False], self.screen.buffer[2][0:2])
 
     def test_SKP_Vx(self):  # Ex9E
         self.cpu.instruction = 0xE19E
@@ -329,10 +329,10 @@ class TestCPU(unittest.TestCase):
         self.cpu.instruction = 0xF10A
         with self.assertRaises(WaitForKeypress):
             self.cpu._LD_Vx_K()
-        self.assertEqual(True, self.cpu.waiting_for_keypress)
+        self.assertTrue(self.cpu.waiting_for_keypress)
 
         self.cpu.key_was_pressed(0x1)
-        self.assertEqual(False, self.cpu.waiting_for_keypress)
+        self.assertFalse(self.cpu.waiting_for_keypress)
         self.assertEqual(0x1, self.cpu.V[0x1])
 
     def test_LD_DT_Vx(self):  # Fx15

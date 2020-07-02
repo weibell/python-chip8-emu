@@ -44,12 +44,12 @@ class TestChip8(unittest.TestCase):
 
         pygame.event.post(pygame.event.Event(SIXTY_HERTZ_CLOCK))
         chip8.handle_events()
-        self.assertEqual(True, chip8.cpu.waiting_for_keypress)
+        self.assertTrue(chip8.cpu.waiting_for_keypress)
 
         pygame.event.post(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_1))
         chip8.handle_events()
 
         pygame.event.post(pygame.event.Event(pygame.KEYUP, key=pygame.K_1))
         chip8.handle_events()
-        self.assertEqual(False, chip8.cpu.waiting_for_keypress)
+        self.assertFalse(chip8.cpu.waiting_for_keypress)
         self.assertEqual(0x01, chip8.cpu.V[0])
