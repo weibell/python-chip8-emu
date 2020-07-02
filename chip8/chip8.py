@@ -32,43 +32,42 @@ class Chip8:
         sixty_hertz_ms = round(1000 / SIXTY_HERTZ)
         pygame.time.set_timer(SIXTY_HERTZ_CLOCK, sixty_hertz_ms)
         print(f"Target CPU speed: {cycles_per_frame * SIXTY_HERTZ} instructions per second")
-        print(f"The screen scaling factor: {scaling_factor}")
+        print(f"Screen scaling factor: {scaling_factor}")
 
     def load(self, rom: bytes):
         self.cpu.load(rom)
 
     def run(self):
-        self._main_loop()
-
-    def _main_loop(self):
-
         while True:
-            for event in pygame.event.get():
-                if event.type == pygame.KEYDOWN:
-                    self.keyboard.keydown(event)
+            self._next_frame()
 
-                elif event.type == pygame.KEYUP:
-                    key = self.keyboard.keyup(event)
-                    if self.cpu.waiting_for_keypress and key is not None:
-                        self.cpu.key_was_pressed(key)
+    def _next_frame(self):
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                self.keyboard.keydown(event)
 
-                elif event.type == SIXTY_HERTZ_CLOCK:
-                    if self.cpu.waiting_for_keypress:
-                        continue
+            elif event.type == pygame.KEYUP:
+                key = self.keyboard.keyup(event)
+                if self.cpu.waiting_for_keypress and key is not None:
+                    self.cpu.key_was_pressed(key)
 
-                    has_screen_changed = False
-                    self.cpu.decrease_timers()
-                    for _ in range(self.cycles_per_frame):
-                        try:
-                            self.cpu.cpu_tick()
-                        except UpdateScreen:
-                            has_screen_changed = True
-                        except WaitForKeypress:
-                            break
-                    self.sound.update(self.cpu.sound_timer)
-                    if has_screen_changed:
-                        self.screen.update()
+            elif event.type == SIXTY_HERTZ_CLOCK:
+                if self.cpu.waiting_for_keypress:
+                    continue
 
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
+                has_screen_changed = False
+                self.cpu.decrease_timers()
+                for _ in range(self.cycles_per_frame):
+                    try:
+                        self.cpu.cpu_tick()
+                    except UpdateScreen:
+                        has_screen_changed = True
+                    except WaitForKeypress:
+                        break
+                self.sound.update(self.cpu.sound_timer)
+                if has_screen_changed:
+                    self.screen.update()
+
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
