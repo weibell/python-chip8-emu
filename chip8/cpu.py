@@ -162,7 +162,7 @@ class CPU:
         return self.V[self.y]
 
     def _CLS(self):  # 00E0
-        for row in self.screen.screen_buffer:
+        for row in self.screen.buffer:
             for x, _ in enumerate(row):
                 row[x] = False
 
@@ -249,8 +249,8 @@ class CPU:
         self.V[0xf] = 0
         sprite = self.memory[self.I:self.I + self.n]
         for byte_number, byte in enumerate(sprite):
-            y = (self.Vy + byte_number) % len(self.screen.screen_buffer)
-            row = self.screen.screen_buffer[y]
+            y = (self.Vy + byte_number) % len(self.screen.buffer)
+            row = self.screen.buffer[y]
 
             sprite_bits = [(byte >> bit_number) & 0b00000001 for bit_number in range(7, -1, -1)]
             for bit_number, sprite_bit in enumerate(sprite_bits):
