@@ -24,6 +24,8 @@ class TestCPU(unittest.TestCase):
         self.assertEqual(0x00, self.cpu.delay_timer)
         self.assertEqual(0x00, self.cpu.sound_timer)
 
+        self.assertEqual(0x042, CPU(Screen(), Keyboard(), starting_address=0x042).program_counter)
+
     def test_decrease_timers(self):
         self.cpu.delay_timer = 0x01
         self.cpu.sound_timer = 0x01
@@ -34,7 +36,6 @@ class TestCPU(unittest.TestCase):
         self.cpu.decrease_timers()
         self.assertEqual(0x00, self.cpu.delay_timer)
         self.assertEqual(0x00, self.cpu.sound_timer)
-
 
     def test_CLS(self):  # 00E0
         for row in self.screen.screen_buffer:

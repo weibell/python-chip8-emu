@@ -39,9 +39,9 @@ class Chip8:
 
     def run(self):
         while True:
-            self._next_frame()
+            self.step()
 
-    def _next_frame(self):
+    def step(self):
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 self.keyboard.keydown(event)
