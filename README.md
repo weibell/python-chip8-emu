@@ -32,11 +32,21 @@ optional arguments:
   --scaling-factor n    Screen scaling factor (default: 8)
   --cycles-per-frame n  CPU cycles per frame (at 60 fps) (default: 10)
   --starting-address n  Starting address (default: 512)
-
 ```
 
-#### Screenshots
+The following keyboard mapping is used:
 
+```
+Keyboard:    CHIP-8:
+
+1 2 3 4      1 2 3 C
+Q W E R      4 5 6 D
+A S D F      7 8 9 E
+Z X C V      A 0 B F
+```
+
+
+#### Screenshots
 
 ```commandline
 $ python3 main.py "roms/games/Pong (1 player).ch8"
