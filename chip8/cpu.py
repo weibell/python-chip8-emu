@@ -127,7 +127,7 @@ class CPU:
             else:
                 return self.opcode_table[first_nibble][self.nn]
         except KeyError:
-            raise UnknownInstruction(f"{self.instruction:0{4}X}")
+            raise UnknownInstruction(self.instruction)
 
     @property
     def x(self) -> int:
@@ -186,7 +186,7 @@ class CPU:
 
     def _SE_Vx_Vy(self):  # 5xy0
         if self.n != 0:
-            raise UnknownInstruction(f"{self.instruction:0{4}X}")
+            raise UnknownInstruction(self.instruction)
 
         if self.Vx == self.Vy:
             self.program_counter += 2
@@ -231,7 +231,7 @@ class CPU:
 
     def _SNE_Vx_Vy(self):  # 9xy0
         if self.n != 0:
-            raise UnknownInstruction(f"{self.instruction:0{4}X}")
+            raise UnknownInstruction(self.instruction)
 
         if self.Vx != self.Vy:
             self.program_counter += 2
@@ -330,7 +330,8 @@ font_sprites = [
 
 
 class UnknownInstruction(Exception):
-    pass
+    def __init__(self, instruction):
+        super().__init__(f"{instruction:0{4}X}")
 
 
 class UpdateScreen(Exception):
