@@ -2,8 +2,8 @@ import unittest
 
 from chip8.screen import Screen
 
-WHITE = (255, 255, 255, 255)
 BLACK = (0, 0, 0, 255)
+WHITE = (255, 255, 255, 255)
 
 
 class TestScreen(unittest.TestCase):
