@@ -20,22 +20,22 @@ class TestChip8(unittest.TestCase):
         chip8.load(ld_V0_41 + ld_DT_V0 + jp_0x042)
 
         pygame.event.post(pygame.event.Event(SIXTY_HERTZ_CLOCK))
-        chip8.handle_events()
+        chip8._handle_events()
         self.assertEqual(0x002, chip8.cpu.program_counter)
         self.assertEqual(0x41, chip8.cpu.V[0])
 
         pygame.event.post(pygame.event.Event(SIXTY_HERTZ_CLOCK))
-        chip8.handle_events()
+        chip8._handle_events()
         self.assertEqual(0x004, chip8.cpu.program_counter)
         self.assertEqual(0x41, chip8.cpu.delay_timer)
 
         pygame.event.post(pygame.event.Event(SIXTY_HERTZ_CLOCK))
-        chip8.handle_events()
+        chip8._handle_events()
         self.assertEqual(0x042, chip8.cpu.program_counter)
 
         pygame.event.post(pygame.event.Event(pygame.QUIT))
         with self.assertRaises(SystemExit):
-            chip8.handle_events()
+            chip8._handle_events()
 
     def test_key_was_pressed(self):
         chip8 = Chip8(scaling_factor=1, cycles_per_frame=1, starting_address=0x000)
@@ -43,14 +43,14 @@ class TestChip8(unittest.TestCase):
         chip8.load(ld_V0_K)
 
         pygame.event.post(pygame.event.Event(SIXTY_HERTZ_CLOCK))
-        chip8.handle_events()
+        chip8._handle_events()
         self.assertTrue(chip8.cpu.waiting_for_keypress)
 
         pygame.event.post(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_1))
-        chip8.handle_events()
+        chip8._handle_events()
 
         pygame.event.post(pygame.event.Event(pygame.KEYUP, key=pygame.K_1))
-        chip8.handle_events()
+        chip8._handle_events()
         self.assertFalse(chip8.cpu.waiting_for_keypress)
         self.assertEqual(0x01, chip8.cpu.V[0])
 
@@ -65,9 +65,9 @@ class TestChip8(unittest.TestCase):
         WHITE = (255, 255, 255, 255)
 
         pygame.event.post(pygame.event.Event(SIXTY_HERTZ_CLOCK))
-        chip8.handle_events()
+        chip8._handle_events()
         self.assertEqual(BLACK, chip8.screen.surface.get_at((0, 0)))
 
         pygame.event.post(pygame.event.Event(SIXTY_HERTZ_CLOCK))
-        chip8.handle_events()
+        chip8._handle_events()
         self.assertEqual(WHITE, chip8.screen.surface.get_at((0, 0)))
