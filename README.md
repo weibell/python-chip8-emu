@@ -54,7 +54,7 @@ $ python3 main.py "roms/games/Pong (alt).ch8"
 <br>
 
 ```commandline
-$ python3 main.py "roms/games/Tetris [Fran Dachille, 1991].ch8""
+$ python3 main.py "roms/games/Tetris [Fran Dachille, 1991].ch8"
 ```
 <div align="center">
     <img src="images/screenshot_tetris.png?raw=true">
