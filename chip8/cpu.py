@@ -25,7 +25,7 @@ class CPU:
 
     memory: bytearray
     stack: List[int]
-    program_counter: int
+    pc: int
     V: List[int]
     I: int
     delay_timer: int
@@ -43,7 +43,7 @@ class CPU:
         self.memory = bytearray(MEMORY_SIZE)
         self.memory[0x000:len(font_sprites)] = font_sprites
         self.stack = []
-        self.program_counter = starting_address
+        self.pc = starting_address
         self.V = [0x00] * 16
         self.I = 0x000
         self.delay_timer = 0x00
@@ -55,9 +55,9 @@ class CPU:
     def load(self, rom: bytes):
         self.memory[self.starting_address:self.starting_address + len(rom)] = rom
 
-    def cpu_tick(self):
-        self.instruction = self.memory[self.program_counter] << 8 | self.memory[self.program_counter + 1]
-        self.program_counter += 2
+    def tick(self):
+        self.instruction = self.memory[self.pc] << 8 | self.memory[self.pc + 1]
+        self.pc += 2
         self.opcode_handler()
 
     def decrease_timers(self):
@@ -167,29 +167,29 @@ class CPU:
                 row[x] = False
 
     def _RET(self):  # 00EE
-        self.program_counter = self.stack.pop()
+        self.pc = self.stack.pop()
 
     def _JP_nnn(self):  # 1nnn
-        self.program_counter = self.nnn
+        self.pc = self.nnn
 
     def _CALL_nnn(self):  # 2nnn
-        self.stack.append(self.program_counter)
-        self.program_counter = self.nnn
+        self.stack.append(self.pc)
+        self.pc = self.nnn
 
     def _SE_Vx_nn(self):  # 3xnn
         if self.Vx == self.nn:
-            self.program_counter += 2
+            self.pc += 2
 
     def _SNE_Vx_nn(self):  # 4xnn
         if self.Vx != self.nn:
-            self.program_counter += 2
+            self.pc += 2
 
     def _SE_Vx_Vy(self):  # 5xy0
         if self.n != 0:
             raise UnknownInstruction(self.instruction)
 
         if self.Vx == self.Vy:
-            self.program_counter += 2
+            self.pc += 2
 
     def _LD_Vx_nn(self):  # 6xnn
         self.Vx = self.nn
@@ -234,13 +234,13 @@ class CPU:
             raise UnknownInstruction(self.instruction)
 
         if self.Vx != self.Vy:
-            self.program_counter += 2
+            self.pc += 2
 
     def _LD_I_nnn(self):  # Annn
         self.I = self.nnn
 
     def _JP_V0_nnn(self):  # Bnnn
-        self.program_counter = self.nnn + self.V[0x0]
+        self.pc = self.nnn + self.V[0x0]
 
     def _RND_Vx_nn(self):  # Cxnn
         self.Vx = random.getrandbits(8) & self.nn
@@ -264,11 +264,11 @@ class CPU:
 
     def _SKP_Vx(self):  # Ex9E
         if self.Vx in self.keyboard.pressed_keys:
-            self.program_counter += 2
+            self.pc += 2
 
     def _SKNP_Vx(self):  # ExA1
         if self.Vx not in self.keyboard.pressed_keys:
-            self.program_counter += 2
+            self.pc += 2
 
     def _LD_Vx_DT(self):  # Fx07
         self.Vx = self.delay_timer

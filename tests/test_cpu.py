@@ -16,15 +16,15 @@ class TestCPU(unittest.TestCase):
         self.assertEqual(cpu.MEMORY_SIZE, len(self.cpu.memory))
         self.assertEqual(bytearray(cpu.font_sprites), self.cpu.memory[0:len(cpu.font_sprites)])
         self.assertEqual([], self.cpu.stack)
-        self.assertEqual(0x200, self.cpu.program_counter)
-        self.assertEqual(0x600, CPU(Screen(), Keyboard(), starting_address=0x600).program_counter)
+        self.assertEqual(0x200, self.cpu.pc)
+        self.assertEqual(0x600, CPU(Screen(), Keyboard(), starting_address=0x600).pc)
         self.assertEqual([0x00] * 16, self.cpu.V)
         self.assertEqual(0x000, self.cpu.I)
         self.assertEqual(0x000, self.cpu.I)
         self.assertEqual(0x00, self.cpu.delay_timer)
         self.assertEqual(0x00, self.cpu.sound_timer)
 
-        self.assertEqual(0x042, CPU(Screen(), Keyboard(), starting_address=0x042).program_counter)
+        self.assertEqual(0x042, CPU(Screen(), Keyboard(), starting_address=0x042).pc)
 
     def test_decrease_timers(self):
         self.cpu.delay_timer = 0x01
@@ -48,65 +48,65 @@ class TestCPU(unittest.TestCase):
     def test_RET(self):  # 00EE
         self.cpu.stack.append(0x42)
         self.cpu._RET()
-        self.assertEqual(0x42, self.cpu.program_counter)
+        self.assertEqual(0x42, self.cpu.pc)
         self.assertEqual([], self.cpu.stack)
 
     def test_JP_nnn(self):  # 1nnn
         self.cpu.instruction = 0x1042
         self.cpu._JP_nnn()
-        self.assertEqual(0x42, self.cpu.program_counter)
+        self.assertEqual(0x42, self.cpu.pc)
 
     def test_CALL_nnn(self):  # 2nnn
         self.cpu.instruction = 0x2042
-        self.cpu.program_counter = 0x1234
+        self.cpu.pc = 0x1234
         self.cpu._CALL_nnn()
-        self.assertEqual(0x42, self.cpu.program_counter)
+        self.assertEqual(0x42, self.cpu.pc)
         self.assertEqual([0x1234], self.cpu.stack)
 
     def test_SE_Vx_nn(self):  # 3xnn
-        addr = self.cpu.program_counter
+        addr = self.cpu.pc
         self.cpu.V[0x1] = 0x42
 
         self.cpu.instruction = 0x3042
         self.cpu._SE_Vx_nn()
-        self.assertEqual(addr, self.cpu.program_counter)
+        self.assertEqual(addr, self.cpu.pc)
 
         self.cpu.instruction = 0x3141
         self.cpu._SE_Vx_nn()
-        self.assertEqual(addr, self.cpu.program_counter)
+        self.assertEqual(addr, self.cpu.pc)
 
         self.cpu.instruction = 0x3142
         self.cpu._SE_Vx_nn()
-        self.assertEqual(addr + 2, self.cpu.program_counter)
+        self.assertEqual(addr + 2, self.cpu.pc)
 
     def test_SNE_Vx_nn(self):  # 4xnn
-        addr = self.cpu.program_counter
+        addr = self.cpu.pc
         self.cpu.V[0x1] = 0x42
 
         self.cpu.instruction = 0x4142
         self.cpu._SNE_Vx_nn()
-        self.assertEqual(addr, self.cpu.program_counter)
+        self.assertEqual(addr, self.cpu.pc)
 
         self.cpu.instruction = 0x4042
         self.cpu._SNE_Vx_nn()
-        self.assertEqual(addr + 2, self.cpu.program_counter)
+        self.assertEqual(addr + 2, self.cpu.pc)
 
         self.cpu.instruction = 0x4141
         self.cpu._SNE_Vx_nn()
-        self.assertEqual(addr + 4, self.cpu.program_counter)
+        self.assertEqual(addr + 4, self.cpu.pc)
 
     def test_SE_Vx_Vy(self):  # 5xy0
         self.cpu.instruction = 0x5120
-        addr = self.cpu.program_counter
+        addr = self.cpu.pc
 
         self.cpu.V[0x1] = 0x41
         self.cpu.V[0x2] = 0x42
         self.cpu._SE_Vx_Vy()
-        self.assertEqual(addr, self.cpu.program_counter)
+        self.assertEqual(addr, self.cpu.pc)
 
         self.cpu.V[0x1] = 0x42
         self.cpu._SE_Vx_Vy()
-        self.assertEqual(addr + 2, self.cpu.program_counter)
+        self.assertEqual(addr + 2, self.cpu.pc)
 
     def test_LD_Vx_nn(self):  # 6xnn
         self.cpu.instruction = 0x6142
@@ -221,16 +221,16 @@ class TestCPU(unittest.TestCase):
 
     def test_SNE_Vx_Vy(self):  # 9xy0
         self.cpu.instruction = 0x9120
-        addr = self.cpu.program_counter
+        addr = self.cpu.pc
 
         self.cpu.V[0x1] = 0x42
         self.cpu.V[0x2] = 0x42
         self.cpu._SNE_Vx_Vy()
-        self.assertEqual(addr, self.cpu.program_counter)
+        self.assertEqual(addr, self.cpu.pc)
 
         self.cpu.V[0x1] = 0x41
         self.cpu._SNE_Vx_Vy()
-        self.assertEqual(addr + 2, self.cpu.program_counter)
+        self.assertEqual(addr + 2, self.cpu.pc)
 
     def test_LD_I_nnn(self):  # Annn
         self.cpu.instruction = 0xA042
@@ -241,7 +241,7 @@ class TestCPU(unittest.TestCase):
         self.cpu.instruction = 0xB042
         self.cpu.V[0x0] = 0x42
         self.cpu._JP_V0_nnn()
-        self.assertEqual(0x42 + 0x42, self.cpu.program_counter)
+        self.assertEqual(0x42 + 0x42, self.cpu.pc)
 
     def test_RND_Vx_nn(self):  # Cxnn
         numbers = set()
@@ -294,30 +294,30 @@ class TestCPU(unittest.TestCase):
 
     def test_SKP_Vx(self):  # Ex9E
         self.cpu.instruction = 0xE19E
-        addr = self.cpu.program_counter
+        addr = self.cpu.pc
 
         self.cpu.V[0x1] = 0x1
 
         self.cpu._SKP_Vx()
-        self.assertEqual(addr, self.cpu.program_counter)
+        self.assertEqual(addr, self.cpu.pc)
 
         self.keyboard.pressed_keys.add(0x1)
         self.cpu._SKP_Vx()
-        self.assertEqual(addr + 2, self.cpu.program_counter)
+        self.assertEqual(addr + 2, self.cpu.pc)
 
     def test_SKNP_Vx(self):  # ExA1
         self.cpu.instruction = 0xE1A1
-        addr = self.cpu.program_counter
+        addr = self.cpu.pc
 
         self.cpu.V[0x1] = 0x1
 
         self.keyboard.pressed_keys.add(0x1)
         self.cpu._SKNP_Vx()
-        self.assertEqual(addr, self.cpu.program_counter)
+        self.assertEqual(addr, self.cpu.pc)
 
         self.keyboard.pressed_keys.remove(0x1)
         self.cpu._SKNP_Vx()
-        self.assertEqual(addr + 2, self.cpu.program_counter)
+        self.assertEqual(addr + 2, self.cpu.pc)
 
     def test_LD_Vx_DT(self):  # Fx07
         self.cpu.instruction = 0xF107

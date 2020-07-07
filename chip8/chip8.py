@@ -52,22 +52,25 @@ class Chip8:
                     self.cpu.key_was_pressed(key)
 
             elif event.type == SIXTY_HERTZ_CLOCK:
-                if self.cpu.waiting_for_keypress:
-                    continue
-
-                has_screen_changed = False
-                self.cpu.decrease_timers()
-                for _ in range(self.cycles_per_frame):
-                    try:
-                        self.cpu.cpu_tick()
-                    except UpdateScreen:
-                        has_screen_changed = True
-                    except WaitForKeypress:
-                        break
-                self.sound.update(self.cpu.sound_timer)
-                if has_screen_changed:
-                    self.screen.update()
+                self.tick()
 
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+
+    def tick(self):
+        if self.cpu.waiting_for_keypress:
+            return
+
+        has_screen_changed = False
+        self.cpu.decrease_timers()
+        for _ in range(self.cycles_per_frame):
+            try:
+                self.cpu.tick()
+            except UpdateScreen:
+                has_screen_changed = True
+            except WaitForKeypress:
+                break
+        self.sound.update(self.cpu.sound_timer)
+        if has_screen_changed:
+            self.screen.update()
