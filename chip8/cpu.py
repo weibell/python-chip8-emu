@@ -55,7 +55,7 @@ class CPU:
     def load(self, rom: bytes):
         self.memory[self.starting_address:self.starting_address + len(rom)] = rom
 
-    def tick(self):
+    def step(self):
         self.instruction = self.memory[self.pc] << 8 | self.memory[self.pc + 1]
         self.pc += 2
         self.opcode_handler()

@@ -66,7 +66,7 @@ class Chip8:
         self.cpu.decrease_timers()
         for _ in range(self.cycles_per_frame):
             try:
-                self.cpu.tick()
+                self.cpu.step()
             except UpdateScreen:
                 has_screen_changed = True
             except WaitForKeypress:
