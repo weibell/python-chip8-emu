@@ -54,7 +54,7 @@ class Chip8:
             elif event.type == SIXTY_HERTZ_CLOCK:
                 self.tick()
 
-            if event.type == pygame.QUIT:
+            elif event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
 
